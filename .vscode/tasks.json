@@ -13,13 +13,8 @@
 				"-o",
 				"compiled_kernel.dll",
 				"--compiler-bindir",
-				"D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64"
+				"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\Hostx64\\x64"
 			],
-			"options": {
-				"env": {
-					"PATH": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64;D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build"
-				}
-			},
 			"presentation": {
 				"reveal": "always",
 				"panel": "new"

@@ -5,11 +5,11 @@ from time import perf_counter
 
 cwd = os.path.dirname(__file__)
 
-add_dll = os.path.join(cwd, "compiled_kernel.dll")
-gpu_add = cuda_python.load_kernel(add_dll, 'addArrays')
+add_dll = os.path.join(cwd, "gpu_tester.dll")
+gpu_add = cuda_python.load_kernel(add_dll, 'arrayTest')
 
 n = 10
-width, height = 480, 360 # 480, 360
+width, height = 200, 100 # 480, 360
 size = width*height
 
 cpu_a = np.random.randint(-10, 11, size)
@@ -30,10 +30,8 @@ start_time = perf_counter()
 for i in range(n):
 	start_time = perf_counter()
 	return_values = cpu_add(cpu_a, cpu_b)
-	print(i)
 end_time = perf_counter()
 time_cpu = end_time - start_time
-
 
 time_gpu = gpu_add(gpu_a, gpu_b, profile=True)
 

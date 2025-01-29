@@ -1,7 +1,6 @@
 """
-This converts ctypes to python types and back.
+This converts ctypes variables to python variables and back.
 """
-
 
 import numpy as np
 
@@ -9,7 +8,6 @@ from ctypes import c_int, c_float, c_double, POINTER, _Pointer
 from typing import Literal
 from .class_types import cIntArray, cFloatArray
 from .error_messages import not_supported
-
 
 
 # The stuff below is also a representation of all supported types

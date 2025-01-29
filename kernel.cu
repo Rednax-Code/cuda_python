@@ -28,7 +28,7 @@ extern "C" __declspec(dllexport) void freeArray(cIntArray* ptr) {
 }
 
 extern "C" __declspec(dllexport) const char* addArraysSignature() {
-    return "((array, array), array)";
+    return "((list[int], list[int]), (list[int]))";
 }
 
 // Host function to add arrays

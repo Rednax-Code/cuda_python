@@ -7,18 +7,13 @@ cwd = os.path.dirname(__file__)
 test_kernel = os.path.join(cwd, "compiled_kernel.dll")
 gpu_add = cuda_python.load_kernel(test_kernel, 'addArrays')
 
-a = 1
-b = 1.0
-c = np.array([1, 2, 3])
-d = (2, 3, 4)
-e = [3, 4, 5]
 
-A = cuda_python.convert(a, 'cuda')
-B = cuda_python.convert(b, 'cuda')
-C = cuda_python.convert(c, 'cuda')
-D = cuda_python.convert(d, 'cuda')
-E = cuda_python.convert(e, 'cuda')
+Array = cuda_python.convert(np.array([0, 2, 3]), 'cuda')
+Tuple = cuda_python.convert((2, 3, 4), 'cuda')
+List = cuda_python.convert([1, 4, 5], 'cuda')
 
-c = gpu_add(C, D)
+Array_List = gpu_add(Array, List)
+#G = gpu_add(F, E)
 
-print(cuda_python.convert(c, 'python'))
+print(cuda_python.convert(Array_List, 'python'))
+#print(cuda_python.convert(G, 'python'))

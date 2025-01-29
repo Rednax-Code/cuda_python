@@ -1,3 +1,7 @@
+"""
+This converts python types to ctypes.
+"""
+
 from numpy import array
 from ctypes import c_int, c_double, POINTER
 from typing import Literal

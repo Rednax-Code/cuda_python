@@ -4,32 +4,47 @@ The base handler. Mainly for loading in kernels and decorating their behavior wh
 
 from collections.abc import Callable
 from os import path, PathLike
+from time import perf_counter
 from ctypes import c_char_p, CDLL, POINTER
 from .class_types import cIntArray
 from .type_converter import convert_inout_data_types
 from .signature_parser import parse
+from .error_messages import wrong_arguments, arrays_not_same_size
+
 
 cwd = path.dirname(__file__)
 
 
-def kernel_function(func):
-	def wrapper(*args):
+def kernel_function(func: Callable):
+	def wrapper(*args, profile: bool=False):
 		expected_arguments = len(func.argtypes)
 		given_arguments = len(args)
 		if given_arguments == expected_arguments:
 			try:
-				return_values = func(*args)
+				if profile:
+					start_time = perf_counter()
+					return_values = func(*args)
+					end_time = perf_counter()
+					return end_time - start_time
+				else:
+					return_values = func(*args)
 			except Exception as e:
 				print(f"Error calling CUDA function: {e}")
+
+			# Check for nullptr
+			if not return_values:
+				print(return_values)
+				raise ValueError(arrays_not_same_size)
 			
-			result = return_values.contents
+			contents = return_values.contents
+			result = contents.deep_copy()
 
 			# Prevent memory leak :)
 			func.freeArray(return_values)
 			
 			return result
 		else:
-			raise TypeError(f'{func.__name__}() takes {expected_arguments} positional arguments but {given_arguments} were given')
+			raise TypeError(wrong_arguments.format(func.__name__, expected_arguments, given_arguments))
 	return wrapper
 
 

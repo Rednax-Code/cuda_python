@@ -1,16 +1,23 @@
 import cuda_python
 import os.path
-import numpy as np
-import ctypes
 
 cwd = os.path.dirname(__file__)
 
-test_kernel = os.path.join(cwd, "compiled_kernel.dll")
-gpu_add = cuda_python.load_kernel(test_kernel, 'addArrays')
+add_dll = os.path.join(cwd, "compiled_kernel.dll")
+add_inputs = [list[int], list[int]]
+add_outputs = [list[int]]
+gpu_add = cuda_python.load_kernel(add_dll, 'addArrays', add_inputs, add_outputs)
 
-a = (ctypes.c_int * 3)(3,2,1)
-b = (ctypes.c_int * 3)(1,2,3)
+a = cuda_python.convert((1,2,3), 'cuda')
+b = cuda_python.convert((2,3,4), 'cuda')
+c = cuda_python.convert((3,4,5), 'cuda')
 
-c = gpu_add(a, b, len(a))
+d = gpu_add(a, b)
 
-print(c)
+print(cuda_python.convert(d, 'python'))
+# prints [6 8 10]
+
+e = gpu_add(d, c)
+
+print(cuda_python.convert(e, 'python'))
+# prints [9 12 15]

@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 #include <iostream>
+#include <string>
 
 // Kernel for adding two arrays
 __global__ void addArraysKernel(int *a, int *b, int *c, int n) {
@@ -9,38 +10,59 @@ __global__ void addArraysKernel(int *a, int *b, int *c, int n) {
     }
 }
 
-extern "C" __declspec(dllexport) void freeMemory(int* ptr) {
-    delete[] ptr;
+struct cIntArray {
+    int* data;
+    int length;
+};
+
+struct cFloatArray {
+    double* data;
+    double length;
+};
+
+extern "C" __declspec(dllexport) void freeArray(cIntArray* ptr) {
+    if (ptr) {
+        delete[] ptr->data;  // Free the dynamically allocated array
+        delete ptr;          // Free the struct itself
+    }
+}
+
+extern "C" __declspec(dllexport) const char* addArraysSignature() {
+    return "((array, array), array)";
 }
 
 // Host function to add arrays
-extern "C" __declspec(dllexport) int* addArrays(int *a, int *b, int n) {
-    int *d_a, *d_b, *d_c;  // Device pointers
-    int *c = new int[n];   // Allocate memory on the host for the result
+extern "C" __declspec(dllexport) cIntArray* addArrays(cIntArray a, cIntArray b) {
+    int *d_a, *d_b, *d_c;
+    int n = a.length;
 
-    // Allocate memory on the GPU for the arrays
+    if (b.length != n) {
+        return nullptr;
+    }
+
+    // Allocate memory for the result
+    cIntArray *result = new cIntArray;
+    result->data = new int[a.length];
+    result->length = a.length;
+
+    // Allocate device memory and perform computations...
     cudaMalloc((void **)&d_a, n * sizeof(int));
     cudaMalloc((void **)&d_b, n * sizeof(int));
     cudaMalloc((void **)&d_c, n * sizeof(int));
+    
+    cudaMemcpy(d_a, a.data, n * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b.data, n * sizeof(int), cudaMemcpyHostToDevice);
 
-    // Copy the input arrays from host to device
-    cudaMemcpy(d_a, a, n * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b, n * sizeof(int), cudaMemcpyHostToDevice);
-
-    // Determine grid and block dimensions
     int threadsPerBlock = 256;
     int blocksPerGrid = (n + threadsPerBlock - 1) / threadsPerBlock;
 
-    // Launch the kernel
     addArraysKernel<<<blocksPerGrid, threadsPerBlock>>>(d_a, d_b, d_c, n);
+    cudaMemcpy(result->data, d_c, n * sizeof(int), cudaMemcpyDeviceToHost);
 
-    // Copy the result array back to the host
-    cudaMemcpy(c, d_c, n * sizeof(int), cudaMemcpyDeviceToHost);
-
-    // Free the allocated device memory
+    // Free device pointers
     cudaFree(d_a);
     cudaFree(d_b);
     cudaFree(d_c);
 
-    return c;
+    return result;
 }

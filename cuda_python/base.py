@@ -15,7 +15,7 @@ from .error_messages import wrong_arguments, arrays_not_same_size
 cwd = path.dirname(__file__)
 
 
-def kernel_function(func: Callable):
+def c_function(func: Callable):
 	def wrapper(*args, profile: bool=False):
 		expected_arguments = len(func.argtypes)
 		given_arguments = len(args)
@@ -48,12 +48,12 @@ def kernel_function(func: Callable):
 	return wrapper
 
 
-def load_kernel(path: str | PathLike, kernel_name: str) -> Callable:
+def load_function(path: str | PathLike, function_name: str) -> Callable:
 	# Load the shared dll
 	shared_dll = CDLL(path)
-	kernel = shared_dll.__getattr__(kernel_name)
+	function = shared_dll.__getattr__(function_name)
 	
-	signature_function = shared_dll.__getattr__(f'{kernel_name}Signature')
+	signature_function = shared_dll.__getattr__(f'{function_name}Signature')
 	signature_function.restype = c_char_p
 	signature = signature_function().decode("utf-8")
 	input_types, output_types = parse(signature)
@@ -61,14 +61,14 @@ def load_kernel(path: str | PathLike, kernel_name: str) -> Callable:
 	converted_input_types = convert_inout_data_types(input_types, 'in')
 	converted_output_types = convert_inout_data_types(output_types, 'out')
 
-	kernel.argtypes = converted_input_types
-	kernel.restype = converted_output_types
+	function.argtypes = converted_input_types
+	function.restype = converted_output_types
 
 	shared_dll.freeArray.argtypes = [POINTER(cIntArray)]
 	shared_dll.freeArray.restype = None
-	kernel.freeArray = shared_dll.freeArray	
+	function.freeArray = shared_dll.freeArray
 
-	return kernel_function(kernel)
+	return c_function(function)
 
 
 # Cleaning up namespace

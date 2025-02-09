@@ -6,7 +6,7 @@ from time import perf_counter
 cwd = os.path.dirname(__file__)
 
 add_dll = os.path.join(cwd, "gpu_tester.dll")
-gpu_add = cuda_python.load_kernel(add_dll, 'arrayTest')
+gpu_add = cuda_python.load_function(add_dll, 'arrayTest')
 
 n = 10
 width, height = 200, 100 # 480, 360

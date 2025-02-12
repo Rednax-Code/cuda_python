@@ -1,7 +1,6 @@
 """
-This converts ctypes to python types and back.
+This converts ctypes variables to python variables and back.
 """
-
 
 import numpy as np
 
@@ -9,7 +8,6 @@ from ctypes import c_int, c_float, c_double, POINTER, _Pointer
 from typing import Literal
 from .class_types import cIntArray, cFloatArray
 from .error_messages import not_supported
-
 
 
 # The stuff below is also a representation of all supported types
@@ -24,11 +22,9 @@ def convert_to_cuda(variable: python_variable) -> cuda_variable:
 		if isinstance(variable, (list, tuple)):
 			variable = np.array(variable)
 		if np.issubdtype(variable.dtype, np.integer):
-			ptr = variable.ctypes.data_as(POINTER(c_int))
-			return cIntArray(ptr, len(variable))
+			return cIntArray(variable)
 		elif np.issubdtype(variable.dtype, np.floating):
-			ptr = variable.ctypes.data_as(POINTER(c_double))
-			return cFloatArray(ptr, len(variable))
+			return cFloatArray(variable)
 	
 	# Convert numbers
 	elif isinstance(variable, int):
@@ -44,7 +40,7 @@ def convert_from_cuda(variable: cuda_variable) ->  python_variable:
 
 	# Convert lists and arrays
 	if isinstance(variable, (cIntArray, cFloatArray)):
-		return np.ctypeslib.as_array(variable.data, shape=(variable.length,))
+		return variable.array.copy()
 
 	# Convert numbers
 	elif isinstance(variable, c_int):

@@ -8,9 +8,9 @@ add_inputs = [list[int], list[int]]
 add_outputs = [list[int]]
 gpu_add = cuda_python.load_kernel(add_dll, 'addArrays', add_inputs, add_outputs)
 
-a = cuda_python.convert((1,2,3), 'cuda')
-b = cuda_python.convert((2,3,4), 'cuda')
-c = cuda_python.convert((3,4,5), 'cuda')
+a = cuda_python.convert((1,0,0), 'cuda')
+b = cuda_python.convert((0,0,0), 'cuda')
+c = cuda_python.convert((0,0,0), 'cuda')
 
 d = gpu_add(a, b)
 

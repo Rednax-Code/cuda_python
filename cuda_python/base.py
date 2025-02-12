@@ -21,6 +21,7 @@ def kernel_function(func):
 			except Exception as e:
 				print(f"Error calling CUDA function: {e}")
 			
+			# This is creates a memory problem
 			result = return_values.contents
 
 			# Prevent memory leak :)
